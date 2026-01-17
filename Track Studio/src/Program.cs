@@ -9,6 +9,7 @@ using System.Reflection;
 using MapStudio.UI;
 using System.Linq;
 using System.Runtime.InteropServices;
+using OpenTK.Graphics.OpenGL;
 
 namespace TrackStudio
 {
@@ -22,11 +23,20 @@ namespace TrackStudio
         {
             //Set directory of config files
             if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Portable.txt")))
+            {
                 Environment.SetEnvironmentVariable("ConfigDir", Runtime.ExecutableDir);
+                Environment.SetEnvironmentVariable("CacheDir", Runtime.ExecutableDir);
+            }
             else
             {
                 var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TrackStudio");
                 Environment.SetEnvironmentVariable("ConfigDir", dataPath);
+
+                var cachePath = dataPath;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    cachePath = Environment.GetEnvironmentVariable("XDG_CACHE_HOME") ?? 
+                                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache", "TrackStudio");
+                Environment.SetEnvironmentVariable("CacheDir", cachePath);
                 
                 //Move user data over to new directory if appdata is being created for the first time
                 if (!Directory.Exists(dataPath))
@@ -51,6 +61,10 @@ namespace TrackStudio
                     if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "Presets")))
                         Directory.Move(Path.Combine(Runtime.ExecutableDir, "Presets"), 
                             Path.Combine(dataPath, "Presets"));
+                    
+                    if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "ShaderCache")))
+                        Directory.Move(Path.Combine(Runtime.ExecutableDir, "ShaderCache"), 
+                            Path.Combine(cachePath, "ShaderCache"));
                 }
             }
             
