@@ -37,7 +37,8 @@ namespace TurboLibrary.CollisionEditor
 
             if (Preset == null)
             {
-                CollisionPresetData.LoadPresets(Directory.GetFiles(System.IO.Path.Combine(Runtime.ExecutableDir,"Presets","Collision")));
+                var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+                CollisionPresetData.LoadPresets(Directory.GetFiles(System.IO.Path.Combine(configDir,"Presets","Collision")));
                 Preset = CollisionPresetData.CollisionPresets.FirstOrDefault();
 
                 if (Preset.MaterialPresets.ContainsKey(KclPrism.CollisionFlags))

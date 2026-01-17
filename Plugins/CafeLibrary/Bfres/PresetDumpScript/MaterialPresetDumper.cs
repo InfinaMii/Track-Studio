@@ -17,8 +17,9 @@ namespace CafeLibrary
         {
             if (!Directory.Exists(gamePath))
                 return;
-
-            string dir = Path.Combine(Toolbox.Core.Runtime.ExecutableDir, "Presets", "Materials");
+            
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            string dir = Path.Combine(configDir, "Presets", "Materials");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 

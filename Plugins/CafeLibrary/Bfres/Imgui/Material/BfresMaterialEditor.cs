@@ -75,7 +75,8 @@ namespace CafeLibrary
                         TinyFileDialog.MessageBoxInfoOk($"Must set a name for the material preset!");
                     else
                     {
-                        material.SaveAsPreset(Path.Combine(Toolbox.Core.Runtime.ExecutableDir,"Presets","Materials",$"{presetName}.json"), exportTextures);
+                        var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+                        material.SaveAsPreset(Path.Combine(configDir,"Presets","Materials",$"{presetName}.json"), exportTextures);
                         TinyFileDialog.MessageBoxInfoOk($"Saved material preset {presetName}!");
                     }
                 }

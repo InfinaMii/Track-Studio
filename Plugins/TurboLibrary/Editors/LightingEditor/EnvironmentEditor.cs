@@ -121,11 +121,12 @@ namespace TurboLibrary.LightingEditor
 
         private void SavePreset(string name)
         {
-            if (!Directory.Exists(System.IO.Path.Combine(Runtime.ExecutableDir,"Presets","Env")))
-                Directory.CreateDirectory(System.IO.Path.Combine(Runtime.ExecutableDir,"Presets","Env"));
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            if (!Directory.Exists(System.IO.Path.Combine(configDir,"Presets","Env")))
+                Directory.CreateDirectory(System.IO.Path.Combine(configDir,"Presets","Env"));
 
             var courseArea = LightingEngine.LightSettings.Resources.EnvFiles["course_area.baglenv"];
-            courseArea.SaveFile(System.IO.Path.Combine(Runtime.ExecutableDir,"Presets","Env",$"{name}.baglenv"));
+            courseArea.SaveFile(System.IO.Path.Combine(configDir,"Presets","Env",$"{name}.baglenv"));
         }
 
         private Vector4 GetAreaColor(int index)

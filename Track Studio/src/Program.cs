@@ -20,6 +20,40 @@ namespace TrackStudio
 
         static void Main(string[] args)
         {
+            //Set directory of config files
+            if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Portable.txt")))
+                Environment.SetEnvironmentVariable("ConfigDir", Runtime.ExecutableDir);
+            else
+            {
+                var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TrackStudio");
+                Environment.SetEnvironmentVariable("ConfigDir", dataPath);
+                
+                //Move user data over to new directory if appdata is being created for the first time
+                if (!Directory.Exists(dataPath))
+                {
+                    Directory.CreateDirectory(dataPath);
+                    if (File.Exists(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json")))
+                        File.Move(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json"),
+                        Path.Combine(dataPath, "ConfigGlobal.json"));
+                    if (File.Exists(Path.Combine(Runtime.ExecutableDir, "CafeConfig.json")))
+                        File.Move(Path.Combine(Runtime.ExecutableDir, "CafeConfig.json"),
+                            Path.Combine(dataPath, "CafeConfig.json"));
+                    if (File.Exists(Path.Combine(Runtime.ExecutableDir, "TurboConfig.json")))
+                        File.Move(Path.Combine(Runtime.ExecutableDir, "TurboConfig.json"),
+                            Path.Combine(dataPath, "TurboConfig.json"));
+                    if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Recent.txt")))
+                        File.Move(Path.Combine(Runtime.ExecutableDir, "Recent.txt"),
+                            Path.Combine(dataPath, "Recent.txt"));
+                    
+                    if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "Logs")))
+                        Directory.Move(Path.Combine(Runtime.ExecutableDir, "Logs"), 
+                            Path.Combine(dataPath, "Logs"));
+                    if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "Presets")))
+                        Directory.Move(Path.Combine(Runtime.ExecutableDir, "Presets"), 
+                            Path.Combine(dataPath, "Presets"));
+                }
+            }
+            
             //Set global for method that compiles during debug building.
             IsDebugCheck(ref IS_DEBUG);
 
@@ -66,12 +100,14 @@ namespace TrackStudio
         {
             if (args.IsTerminating)
             {
-                if (!Directory.Exists("Logs"))
-                    Directory.CreateDirectory("Logs");
+                var logDir = Path.Combine(Environment.GetEnvironmentVariable("ConfigDir")!, "Logs");
+                
+                if (!Directory.Exists(logDir))
+                    Directory.CreateDirectory(logDir);
 
                 string date = DateTime.Now.ToFileTime().ToString();
                 Exception e = (Exception)args.ExceptionObject;
-                File.WriteAllText(Path.Combine(Runtime.ExecutableDir,"Logs",$"CrashLog_{date}.txt"), $"{e.Message}\n {e.StackTrace}");
+                File.WriteAllText(Path.Combine(logDir,$"CrashLog_{date}.txt"), $"{e.Message}\n {e.StackTrace}");
             }
         }
 

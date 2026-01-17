@@ -34,9 +34,10 @@ namespace CafeLibrary
         /// <returns></returns>
         public static PluginConfig Load()
         {
-            if (!File.Exists(Path.Combine(Runtime.ExecutableDir,"CafeConfig.json"))) { new PluginConfig().Save(); }
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            if (!File.Exists(Path.Combine(configDir,"CafeConfig.json"))) { new PluginConfig().Save(); }
 
-            var config = JsonConvert.DeserializeObject<PluginConfig>(File.ReadAllText(Path.Combine(Runtime.ExecutableDir,"CafeConfig.json")));
+            var config = JsonConvert.DeserializeObject<PluginConfig>(File.ReadAllText(Path.Combine(configDir,"CafeConfig.json")));
             config.Reload();
             return config;
         }
@@ -65,7 +66,8 @@ namespace CafeLibrary
         /// </summary>
         public void Save()
         {
-            File.WriteAllText(Path.Combine(Runtime.ExecutableDir,"CafeConfig.json"), JsonConvert.SerializeObject(this));
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            File.WriteAllText(Path.Combine(configDir,"CafeConfig.json"), JsonConvert.SerializeObject(this));
             Reload();
         }
 

@@ -52,10 +52,11 @@ namespace CafeLibrary
             string DefaultPreset = "";
             bool isCourse = fmdl.ResFile.Name == "course_model.szs";
             bool isSwitch = fmdl.ResFile.IsPlatformSwitch;
-            if (isCourse && !isSwitch && File.Exists(Path.Combine(Runtime.ExecutableDir, "Presets", "Materials", "MK8U", "Opaque", "Normal.zip")))
-                DefaultPreset = Path.Combine(Runtime.ExecutableDir, "Presets", "Materials", "MK8U", "Opaque", "Normal.zip");
-            if (isCourse && isSwitch && File.Exists(Path.Combine(Runtime.ExecutableDir, "Presets", "Materials", "MK8D", "Opaque", "Normal.zip")))
-                DefaultPreset = Path.Combine(Runtime.ExecutableDir, "Presets", "Materials", "MK8D", "Opaque", "Normal.zip");
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            if (isCourse && !isSwitch && File.Exists(Path.Combine(configDir, "Presets", "Materials", "MK8U", "Opaque", "Normal.zip")))
+                DefaultPreset = Path.Combine(configDir, "Presets", "Materials", "MK8U", "Opaque", "Normal.zip");
+            if (isCourse && isSwitch && File.Exists(Path.Combine(configDir, "Presets", "Materials", "MK8D", "Opaque", "Normal.zip")))
+                DefaultPreset = Path.Combine(configDir, "Presets", "Materials", "MK8D", "Opaque", "Normal.zip");
 
             Fmdl = fmdl;
 
