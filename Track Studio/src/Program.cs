@@ -55,7 +55,7 @@ namespace TrackStudio
             {
                 var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 wnd.Icon = new System.Drawing.Icon(
-                    System.IO.File.Open(Path.Combine(assemblyDir, "Icon.ico"), FileMode.Open), 256, 256);
+                    System.IO.File.Open(Path.Combine(assemblyDir, "Icon.ico"), FileMode.Open, FileAccess.Read), 256, 256);
             }
 
             wnd.VSync = OpenTK.VSyncMode.On;
