@@ -26,6 +26,11 @@ namespace TrackStudio
             {
                 Environment.SetEnvironmentVariable("ConfigDir", Runtime.ExecutableDir);
                 Environment.SetEnvironmentVariable("CacheDir", Runtime.ExecutableDir);
+                
+                //Update location of asset config (if necessary)
+                if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Lib", "AssetConfig.json")))
+                    File.Move(Path.Combine(Runtime.ExecutableDir, "Lib", "AssetConfig.json"),
+                        Path.Combine(Runtime.ExecutableDir, "AssetConfig.json"));
             }
             else
             {
@@ -38,10 +43,11 @@ namespace TrackStudio
                                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache", "TrackStudio");
                 Environment.SetEnvironmentVariable("CacheDir", cachePath);
                 
-                //Move user data over to new directory if appdata is being created for the first time
+                //Move user data over to new directory if appdata is being created for the first time (e.g. just updated)
                 if (!Directory.Exists(dataPath))
                 {
                     Directory.CreateDirectory(dataPath);
+                    
                     if (File.Exists(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json")))
                         File.Move(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json"),
                         Path.Combine(dataPath, "ConfigGlobal.json"));
@@ -54,6 +60,10 @@ namespace TrackStudio
                     if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Recent.txt")))
                         File.Move(Path.Combine(Runtime.ExecutableDir, "Recent.txt"),
                             Path.Combine(dataPath, "Recent.txt"));
+                    
+                    if (File.Exists(Path.Combine(Runtime.ExecutableDir, "Lib", "AssetConfig.json")))
+                        File.Move(Path.Combine(Runtime.ExecutableDir, "Lib", "AssetConfig.json"),
+                            Path.Combine(dataPath, "AssetConfig.json"));
                     
                     if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "Logs")))
                         Directory.Move(Path.Combine(Runtime.ExecutableDir, "Logs"), 
