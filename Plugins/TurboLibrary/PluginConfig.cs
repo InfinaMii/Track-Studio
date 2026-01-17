@@ -72,9 +72,10 @@ namespace TurboLibrary
         /// </summary>
         /// <returns></returns>
         public static PluginConfig Load() {
-            if (!File.Exists(System.IO.Path.Combine(Runtime.ExecutableDir,"TurboConfig.json"))) { new PluginConfig().Save(); }
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            if (!File.Exists(System.IO.Path.Combine(configDir,"TurboConfig.json"))) { new PluginConfig().Save(); }
 
-            var config = JsonConvert.DeserializeObject<PluginConfig>(File.ReadAllText(System.IO.Path.Combine(Runtime.ExecutableDir,"TurboConfig.json")));
+            var config = JsonConvert.DeserializeObject<PluginConfig>(File.ReadAllText(System.IO.Path.Combine(configDir,"TurboConfig.json")));
             config.Reload();
             return config;
         }
@@ -82,8 +83,9 @@ namespace TurboLibrary
         /// <summary>
         /// Saves the current configuration to json on disc.
         /// </summary>
-        public void Save() {
-           File.WriteAllText(System.IO.Path.Combine(Runtime.ExecutableDir,"TurboConfig.json"), JsonConvert.SerializeObject(this));
+        public void Save() { 
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            File.WriteAllText(System.IO.Path.Combine(configDir,"TurboConfig.json"), JsonConvert.SerializeObject(this));
             Reload();
         }
 

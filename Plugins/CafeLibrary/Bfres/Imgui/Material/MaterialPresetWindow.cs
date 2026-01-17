@@ -37,11 +37,12 @@ namespace CafeLibrary
         public void LoadPresets(bool isSwitch)
         {
             _isSwitch = isSwitch;
+            
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            if (!Directory.Exists(Path.Combine(configDir,"Presets","Materials")))
+                Directory.CreateDirectory(Path.Combine(configDir,"Presets","Materials"));
 
-            if (!Directory.Exists(Path.Combine(Runtime.ExecutableDir,"Presets","Materials")))
-                Directory.CreateDirectory(Path.Combine(Runtime.ExecutableDir,"Presets","Materials"));
-
-            GlobalPresets = GetPresetsFromFolder(Path.Combine(Runtime.ExecutableDir,"Presets","Materials"), _isSwitch);
+            GlobalPresets = GetPresetsFromFolder(Path.Combine(configDir,"Presets","Materials"), _isSwitch);
             loaded = true;
         }
 
@@ -51,7 +52,9 @@ namespace CafeLibrary
             {
                 UpdaterHelper.Setup("MapStudioProject", "MapStudio-Materials", "VersionMats.txt");
 
-                var release = UpdaterHelper.TryGetLatest(Runtime.ExecutableDir, 0);
+                
+                var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+                var release = UpdaterHelper.TryGetLatest(configDir, 0);
                 if (release == null)
                     TinyFileDialog.MessageBoxInfoOk($"Build is up to date with the latest repo!");
                 else
@@ -60,14 +63,14 @@ namespace CafeLibrary
                     if (result == 1)
                     {
                         //Download
-                        UpdaterHelper.DownloadRelease(Path.Combine(Runtime.ExecutableDir,"Presets","Materials"), release, 0).Wait();
+                        UpdaterHelper.DownloadRelease(Path.Combine(configDir,"Presets","Materials"), release, 0).Wait();
                         GlobalPresets.Children.Clear();
                         selectedMaterial = null;
 
                         //Exit the tool and install via the updater
-                        UpdaterHelper.Install(Path.Combine(Runtime.ExecutableDir,"Presets","Materials"));
+                        UpdaterHelper.Install(Path.Combine(configDir,"Presets","Materials"));
                         //Reload presets
-                        GlobalPresets = GetPresetsFromFolder(Path.Combine(Runtime.ExecutableDir,"Presets","Materials"), _isSwitch);
+                        GlobalPresets = GetPresetsFromFolder(Path.Combine(configDir,"Presets","Materials"), _isSwitch);
                     }
                 }
             }

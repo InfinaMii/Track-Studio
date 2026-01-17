@@ -91,9 +91,11 @@ namespace TrackStudio
                     IconManager.LoadTextureFile(imageFile, 64, 64);
                 }
             }
+            
             //Load recent file lists
-            RecentFileHandler.LoadRecentList(Path.Combine(Runtime.ExecutableDir, "Recent.txt"), RecentFiles);
-            RecentFileHandler.LoadRecentList(Path.Combine(Runtime.ExecutableDir, "RecentProjects.txt"), RecentProjects);
+            var configDir = Environment.GetEnvironmentVariable("ConfigDir")!;
+            RecentFileHandler.LoadRecentList(Path.Combine(configDir, "Recent.txt"), RecentFiles);
+            RecentFileHandler.LoadRecentList(Path.Combine(configDir, "RecentProjects.txt"), RecentProjects);
 
             foreach (var file in _arguments.FileInput)
                 LoadFileFormat(file);
