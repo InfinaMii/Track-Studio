@@ -47,6 +47,7 @@ namespace TrackStudio
                 if (!Directory.Exists(dataPath))
                 {
                     Directory.CreateDirectory(dataPath);
+                    Directory.CreateDirectory(cachePath);
                     
                     if (File.Exists(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json")))
                         File.Move(Path.Combine(Runtime.ExecutableDir, "ConfigGlobal.json"),
