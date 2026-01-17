@@ -25,6 +25,7 @@ namespace CafeLibrary.Rendering
             string vertHash = GetHashSHA1(vertexData);
 
             string key = $"{vertHash}_{fragHash}";
+            var cachePath = Path.Combine(Environment.GetEnvironmentVariable("CacheDir")!, "ShaderCache");
 
             if (GLShaderPrograms.ContainsKey(key))
             {
@@ -33,27 +34,27 @@ namespace CafeLibrary.Rendering
                     Program = GLShaderPrograms[key],
                     VertexConstants = GetConstants(shaderData.VertexShaderCode),
                     PixelConstants = GetConstants(shaderData.PixelShaderCode),
-                    FragPath = $"ShaderCache/{fragHash}.frag",
-                    VertPath = $"ShaderCache/{vertHash}.vert",
+                    FragPath = $"{cachePath}/{fragHash}.frag",
+                    VertPath = $"{cachePath}/{vertHash}.vert",
                 };
             }
 
-            if (!Directory.Exists($"ShaderCache"))
-                Directory.CreateDirectory("ShaderCache");
+            if (!Directory.Exists(cachePath))
+                Directory.CreateDirectory(cachePath);
 
-            if (!File.Exists($"ShaderCache/{vertHash}.vert"))
+            if (!File.Exists($"{cachePath}/{vertHash}.vert"))
             {
-                File.WriteAllText($"ShaderCache/{vertHash}.vert",
+                File.WriteAllText($"{cachePath}/{vertHash}.vert",
                       DecompileShader(BfshaLibrary.ShaderType.VERTEX, vertexData));
             }
-            if (!File.Exists($"ShaderCache/{fragHash}.frag"))
-                File.WriteAllText($"ShaderCache/{fragHash}.frag",
+            if (!File.Exists($"{cachePath}/{fragHash}.frag"))
+                File.WriteAllText($"{cachePath}/{fragHash}.frag",
                      DecompileShader(BfshaLibrary.ShaderType.PIXEL, fragData));
 
             //Load the source to opengl
             var program = new ShaderProgram(
-                            new FragmentShader(File.ReadAllText($"ShaderCache/{fragHash}.frag")),
-                            new VertexShader(File.ReadAllText($"ShaderCache/{vertHash}.vert")));
+                            new FragmentShader(File.ReadAllText($"{cachePath}/{fragHash}.frag")),
+                            new VertexShader(File.ReadAllText($"{cachePath}/{vertHash}.vert")));
 
             GLShaderPrograms.Add(key, program);
 
@@ -62,8 +63,8 @@ namespace CafeLibrary.Rendering
                 Program = program,
                 VertexConstants = GetConstants(shaderData.VertexShaderCode),
                 PixelConstants = GetConstants(shaderData.PixelShaderCode),
-                FragPath = $"ShaderCache/{fragHash}.frag",
-                VertPath = $"ShaderCache/{vertHash}.vert",
+                FragPath = $"{cachePath}/{fragHash}.frag",
+                VertPath = $"{cachePath}/{vertHash}.vert",
             };
         }
 
