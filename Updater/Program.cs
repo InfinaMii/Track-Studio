@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Updater
 {
@@ -14,18 +16,19 @@ namespace Updater
             execDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 
             bool force = args.Contains("-f");
+            args = ["-d", "-i", "-b"];
             foreach (string arg in args)
             {
                 switch (arg)
                 {
                     case "-d":
                     case "--download":
-                        UpdaterHelper.Setup("MapStudioProject", "Track-Studio", "TrackStudio.exe");
+                        UpdaterHelper.SetupOctokit("MapStudioProject", "Track-Studio");
                         UpdaterHelper.DownloadLatest(execDirectory, 0, force);
                         break;
                     case "-i":
                     case "--install":
-                        UpdaterHelper.Install(execDirectory);
+                        UpdaterHelper.Install(execDirectory, "TrackStudio" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ""));
                         break;
                     case "-b":
                     case "--boot":
@@ -50,7 +53,7 @@ namespace Updater
             Console.WriteLine("Booting...");
 
             Thread.Sleep(3000);
-            System.Diagnostics.Process.Start(Path.Combine(execDirectory, "TrackStudioLauncher.exe"));
+            Process.Start(Path.Combine(execDirectory, "TrackStudioLauncher.exe"));
         }
 
         static void Boot()
@@ -58,7 +61,11 @@ namespace Updater
             Console.WriteLine("Booting...");
 
             Thread.Sleep(3000);
-            System.Diagnostics.Process.Start(Path.Combine(execDirectory, "TrackStudio.exe"));
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Process.Start(Path.Combine(execDirectory, "TrackStudio.exe"));
+            else 
+                Process.Start("sh", $"-c \"dotnet \'{Path.Combine(execDirectory, "TrackStudio.dll")}\'\"");
         }
+
     }
 }

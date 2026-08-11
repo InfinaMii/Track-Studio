@@ -17,25 +17,17 @@ namespace Updater
     /// </summary>
     public class UpdaterHelper
     {
-        private static string _owner = "";
-        private static string _repo = "";
-        private static string _process_name = "";
-
         private static Release[] releases;
 
         /// <summary>
-        /// Prepares the updater with the repo owner, repo name, and process to target installing.
+        /// Prepares the updater with the repo owner and repo name for downloading.
         /// </summary>
-        public static void Setup(string owner, string repo, string process = "")
+        public static void SetupOctokit(string owner, string repo)
         {
-            _owner = owner;
-            _repo = repo;
-            _process_name = process;
-
             //Get the current set of releases for the owner and repo
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             var client = new GitHubClient(new ProductHeaderValue("UpdaterTool"));
-            GetReleases(client).Wait();
+            GetReleases(client, owner, repo).Wait();
         }
 
         /// <summary>
@@ -117,7 +109,7 @@ namespace Updater
         /// <summary>
         /// Installs the currently downloaded and extracted update to the given folder directory.
         /// </summary>
-        public static void Install(string folderDir)
+        public static void Install(string folderDir, string processName)
         {
             string path = Path.Combine(folderDir,"latest","net8.0");
 
@@ -125,21 +117,23 @@ namespace Updater
                 Console.WriteLine($"No downloaded directory found!");
                 return;
             }
-
-            if (Process.GetProcessesByName(_process_name).Any()) {
+            
+            if (Process.GetProcessesByName(processName).Any()) {
                 Console.WriteLine($"Cannot install update while application is running. Please close it then try again!");
                 return;
             }
+            
+            Console.WriteLine("Installing the files in latest/...");
 
             //Transfer the downloaded update files onto the current tool. 
             foreach (string dir in Directory.GetDirectories(path))
             {
                 string dirName = new DirectoryInfo(dir).Name;
                 //Remove existing directories
-                if (Directory.Exists(Path.Combine(folderDir, dirName + @"\")))
-                    Directory.Delete(Path.Combine(folderDir, dirName + @"\"), true);
+                if (Directory.Exists(Path.Combine(folderDir, dirName)))
+                    Directory.Delete(Path.Combine(folderDir, dirName), true);
 
-                Directory.Move(dir, Path.Combine(folderDir, dirName + @"\"));
+                Directory.Move(dir, Path.Combine(folderDir, dirName));
             }
             foreach (string file in Directory.GetFiles(path))
             {
@@ -154,12 +148,13 @@ namespace Updater
                 File.Move(file, Path.Combine(folderDir, Path.GetFileName(file)));
             }
             Directory.Delete(Path.Combine(folderDir,"latest"), true);
+            Console.WriteLine("Finished installing!");
         }
 
-        static async Task GetReleases(GitHubClient client)
+        static async Task GetReleases(GitHubClient client, string owner, string repo)
         {
             List<Release> Releases = new List<Release>();
-            foreach (Release r in await client.Repository.Release.GetAll(_owner, _repo))
+            foreach (Release r in await client.Repository.Release.GetAll(owner, repo))
                 Releases.Add(r);
             releases = Releases.ToArray();
         }
