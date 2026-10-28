@@ -149,6 +149,9 @@
     <None Update="Lib\Licenses\Ryujinx.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Lib\Licenses\LibGDIPlus.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Lib\Licenses\SpirvCrossLicense.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -188,7 +191,11 @@
     <None Update="x86\libzstd.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+    </ItemGroup>
+
+  <Target Name="CopyRuntimes" AfterTargets="Build">
+    <Copy SourceFiles="libgdiplus.so" DestinationFolder="$(OutDir)/runtimes/linux-x64/native"/>
+  </Target>
 
   <ItemGroup>
     <Folder Include="Lib\Presets\" />
